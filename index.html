@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureFence Pro - Security Control Center</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase v9 SDK -->
+    <script type="module">
+        // Firebase Configuration (EXACT as provided)
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { getDatabase } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_-crpAPh4hVt6tv5V7WO96dbMj26lLZM",
+            authDomain: "fence-5db16.firebaseapp.com",
+            databaseURL: "https://fence-5db16-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fence-5db16",
+            storageBucket: "fence-5db16.firebasestorage.app",
+            messagingSenderId: "250832247561",
+            appId: "1:250832247561:web:b0febfcafb1cc9fb77d1d8",
+            measurementId: "G-G7JN5VTXGV"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const analytics = getAnalytics(app);
+
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseDatabase = database;
+    </script>
+</head>
+<body>
+    <!-- Connection Status Indicator -->
+    <div id="connectionStatus" class="connection-status hidden">
+        <div class="connection-indicator offline">
+            <span class="status-dot"></span>
+            <span class="status-text">Connecting to Firebase...</span>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <div class="shield-icon">🛡️</div>
+                        <h1>SecureFence Pro</h1>
+                        <p>Security Control Center</p>
+                    </div>
+                </div>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Sign In</button>
+                    <div id="loginError" class="login-error hidden"></div>
+                </form>
+                <div class="demo-credentials">
+                    <small>Demo: admin / password123</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardPage" class="page hidden">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo-section">
+                        <div class="shield-icon">🛡️</div>
+                        <div class="logo-text">
+                            <h1>SecureFence Pro</h1>
+                            <span class="header-subtitle">Security Control Center</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="header-center">
+                    <div class="status-indicator">
+                        <div id="headerStatusDot" class="status-dot offline"></div>
+                        <span id="headerStatusText" class="status-text">CONNECTING</span>
+                    </div>
+                    <div class="time-display">
+                        <div id="currentTime" class="time">00:06:06</div>
+                        <div id="currentDate" class="date">Monday, September 29, 2025</div>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <div class="user-welcome">
+                        <span id="welcomeText">Welcome back, Amaan01</span>
+                        <button id="logoutBtn" class="btn btn--outline btn--sm">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <div class="dashboard-container">
+                <div class="dashboard-grid">
+                    <!-- Left Column - System Monitoring -->
+                    <div class="left-column">
+                        <!-- Fence Status Card -->
+                        <div class="card monitoring-card">
+                            <div class="card__body">
+                                <div class="card-header">
+                                    <span class="card-icon">⚡</span>
+                                    <h3>Fence Status</h3>
+                                </div>
+                                <div class="status-content">
+                                    <div class="status-indicator-large">
+                                        <div id="fenceStatusDot" class="status-dot active"></div>
+                                        <span id="fenceStatusText" class="status-text-large">FENCE ACTIVE</span>
+                                    </div>
+                                    <button id="energizedBtn" class="status-button energized">ENERGIZED</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Power Monitoring Card -->
+                        <div class="card monitoring-card">
+                            <div class="card__body">
+                                <div class="card-header">
+                                    <span class="card-icon">🔋</span>
+                                    <h3>Power Monitoring</h3>
+                                </div>
+                                <div class="power-content">
+                                    <div class="power-readings">
+                                        <div class="power-metric">
+                                            <span id="currentReading" class="metric-value">2.2 A</span>
+                                            <span class="metric-trend up">↑</span>
+                                        </div>
+                                        <div class="power-metric">
+                                            <span id="voltageReading" class="metric-value">12.5 V</span>
+                                        </div>
+                                    </div>
+                                    <div class="battery-indicator">
+                                        <div class="battery-label">Battery</div>
+                                        <div class="battery-bar">
+                                            <div id="batteryLevel" class="battery-fill" style="width: 87%"></div>
+                                        </div>
+                                        <div id="batteryPercent" class="battery-percent">87%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Health Card -->
+                        <div class="card monitoring-card">
+                            <div class="card__body">
+                                <div class="card-header">
+                                    <span class="card-icon">📶</span>
+                                    <h3>System Health</h3>
+                                </div>
+                                <div class="health-content">
+                                    <div class="health-item">
+                                        <span class="health-label">ESP32 Device:</span>
+                                        <div class="health-status">
+                                            <div id="deviceStatusDot" class="status-dot online"></div>
+                                            <span id="deviceStatusText">Online</span>
+                                        </div>
+                                    </div>
+                                    <div class="health-item">
+                                        <span class="health-label">Last Update:</span>
+                                        <span id="lastUpdateText">10 seconds ago</span>
+                                    </div>
+                                    <div class="health-item">
+                                        <span class="health-label">Signal Strength:</span>
+                                        <span id="signalStrengthText" class="signal-strength">📶 4/5</span>
+                                    </div>
+                                    <div id="systemHealthMessage" class="health-status-message">All Systems Operational</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center Column - Primary Control -->
+                    <div class="center-column">
+                        <!-- Primary Control -->
+                        <div class="card control-card">
+                            <div class="card__body">
+                                <div class="control-header">
+                                    <span class="card-icon">⚡</span>
+                                    <h3>Primary Control</h3>
+                                    <p class="control-subtitle">Main fence energizer control</p>
+                                </div>
+                                <div class="primary-control">
+                                    <button id="energizerBtn" class="energizer-btn active">ENERGIZER ON</button>
+                                    <div class="toggle-container">
+                                        <span class="toggle-label">OFF</span>
+                                        <div class="toggle-switch large">
+                                            <input type="checkbox" id="mainToggle" checked>
+                                            <span class="toggle-slider"></span>
+                                        </div>
+                                        <span class="toggle-label">ON</span>
+                                    </div>
+                                    <div id="statusMessage" class="status-message active">
+                                        🟢 Fence is energized and operational
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Controls -->
+                        <div class="card control-card">
+                            <div class="card__body">
+                                <div class="control-header">
+                                    <h3>Secondary Controls</h3>
+                                    <p class="control-subtitle">Additional system functions</p>
+                                </div>
+                                <div class="secondary-controls">
+                                    <button id="emergencyStopBtn" class="btn btn--danger btn--full-width">
+                                        ⚠️ Emergency Stop
+                                    </button>
+                                    <button id="testModeBtn" class="btn btn--warning btn--full-width">
+                                        ⚡ Test Mode
+                                    </button>
+                                    <button id="systemResetBtn" class="btn btn--secondary btn--full-width">
+                                        🔄 System Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Statistics -->
+                        <div class="card stats-card">
+                            <div class="card__body">
+                                <div class="stats-grid">
+                                    <div class="stat-item">
+                                        <div class="stat-value">24/7</div>
+                                        <div class="stat-label">Monitoring</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">99.9%</div>
+                                        <div class="stat-label">Uptime</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div id="outputValue" class="stat-value">12.5kV</div>
+                                        <div class="stat-label">Output</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Alerts & Activity -->
+                    <div class="right-column">
+                        <!-- System Alerts -->
+                        <div class="card alerts-card">
+                            <div class="card__body">
+                                <div class="card-header">
+                                    <div class="alerts-title">
+                                        <span class="card-icon">🔔</span>
+                                        <h3>System Alerts</h3>
+                                        <div id="alertBadge" class="alert-badge">0</div>
+                                    </div>
+                                </div>
+                                <div class="alert-counts">
+                                    <div class="alert-count critical">
+                                        <span id="criticalCount" class="count">0</span>
+                                        <span class="label">Critical</span>
+                                    </div>
+                                    <div class="alert-count warning">
+                                        <span id="warningCount" class="count">0</span>
+                                        <span class="label">Warning</span>
+                                    </div>
+                                    <div class="alert-count info">
+                                        <span id="infoCount" class="count">0</span>
+                                        <span class="label">Info</span>
+                                    </div>
+                                </div>
+                                <div class="alert-filters">
+                                    <button class="filter-btn active">All</button>
+                                    <button class="filter-btn">Critical</button>
+                                    <button class="filter-btn">Today</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="card activity-card">
+                            <div class="card__body">
+                                <div class="card-header">
+                                    <div class="activity-title">
+                                        <span class="card-icon">📊</span>
+                                        <h3>Recent Activity</h3>
+                                        <div id="activityCountBadge" class="activity-count">0</div>
+                                    </div>
+                                </div>
+                                <div id="activityList" class="activity-list">
+                                    <div class="loading-message">Loading activity data...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal hidden">
+        <div class="modal-backdrop">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Connection Error</h3>
+                    <button id="closeErrorModal" class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessage">Unable to connect to Firebase. Please check your connection and try again.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="retryConnection" class="btn btn--primary">Retry Connection</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
